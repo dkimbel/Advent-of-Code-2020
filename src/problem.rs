@@ -1,8 +1,7 @@
 use std::fmt;
 
-use anyhow::Result;
-
-#[derive(Debug)]
+#[allow(dead_code)] // typically only one variant is used at a time
+#[derive(Debug, Copy, Clone)]
 pub enum Part {
     One,
     Two,
@@ -18,6 +17,6 @@ impl fmt::Display for Part {
     }
 }
 
-pub trait Solvable {
-    fn solve(part: Part) -> Result<()>;
+pub trait Solved {
+    fn print_solution(part: Part);
 }

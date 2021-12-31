@@ -3,37 +3,39 @@ use std::io::{BufRead, BufReader};
 
 use anyhow::{anyhow, Result};
 
-use crate::problem::{Part, Solvable};
+use crate::problem::{Part, Solved};
 
 // TODO(dkimbel): POTENTIAL IMPROVEMENTS
-//   - create a rudimentary test using sample file, and ensure that I have no
-//     more 'unused' warnings
 //   - create a custom iterator that can take an arbitrary number of input vecs
 //     and return a vec (or ideally array) of their combined values; then use
 //     that to solve parts one and two using the same code
 
-const SAMPLE_FILE_PATH: &str = "day1/resources/sample";
-const INPUT_FILE_PATH: &str = "day1/resources/puzzle_inputs";
+const INPUT_FILE_PATH: &str = "src/day1/resources/puzzle_inputs";
 
 pub struct Day1;
 
-impl Solvable for Day1 {
-    fn solve(problem_part: Part) -> Result<()> {
-        let analyzer = ExpenseAnalyzer::new(INPUT_FILE_PATH)?;
+impl Day1 {
+    fn solve(problem_part: Part, input_file_path: &str) -> Result<u32> {
+        let analyzer = ExpenseAnalyzer::new(input_file_path)?;
 
-        match problem_part {
+        let solution = match problem_part {
             Part::One => {
                 let (expense_1, expense_2) = analyzer.find_summing_pair(2020)?;
-                let solution = expense_1 * expense_2;
-                println!("{} solution: {}", problem_part, solution);
+                expense_1 * expense_2
             },
             Part::Two => {
                 let (expense_1, expense_2, expense_3) = analyzer.find_summing_triple(2020)?;
-                let solution = expense_1 * expense_2 * expense_3;
-                println!("{} solution: {}", problem_part, solution);
+                expense_1 * expense_2 * expense_3
             },
-        }
-        Ok(())
+        };
+        Ok(solution)
+    }
+}
+
+impl Solved for Day1 {
+    fn print_solution(part: Part) {
+        let solution = Self::solve(part, INPUT_FILE_PATH).unwrap();
+        println!("Day 1 {} solution: {}", part, solution);
     }
 }
 
@@ -85,5 +87,24 @@ impl ExpenseAnalyzer {
             }
         }
         Err(anyhow!("Could not find a set of expenses summing to {}", target_sum))
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    const TEST_FILE_PATH: &str = "src/day1/resources/sample";
+
+    #[test]
+    fn test_part_one() {
+        let solution = Day1::solve(Part::One, TEST_FILE_PATH).unwrap();
+        assert_eq!(solution, 514579);
+    }
+
+    #[test]
+    fn test_part_two() {
+        let solution = Day1::solve(Part::Two, TEST_FILE_PATH).unwrap();
+        assert_eq!(solution, 241861950);
     }
 }
