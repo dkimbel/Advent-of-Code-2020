@@ -2,19 +2,21 @@ use std::error::Error;
 use std::fs;
 use std::io::{BufRead, BufReader};
 
-use crate::ProblemPart;
 use anyhow::{anyhow, Result};
+
+use crate::ProblemPart;
 
 // TODO(dkimbel): POTENTIAL IMPROVEMENTS
 //   - make some trait that lets every day's solution impl solve with an input
-//     file path and a ProblemPart. Also make it expose the input file path const/attr?
+//     file path and a ProblemPart. Also make it expose the input file path
+//     const/attr?
 //   - refactor ProblemPart into its own file?
 //   - start my own custom rustfmt config file
 //   - make my own Clippy config
 //   - try out the CLion profiler on this code
 //   - create a custom iterator that can take an arbitrary number of input vecs
-//     and return a vec (or ideally array) of their combined values; then use that to solve
-//     parts one and two using the same code
+//     and return a vec (or ideally array) of their combined values; then use
+//     that to solve parts one and two using the same code
 
 pub const SAMPLE_FILE_PATH: &str = "day1/resources/sample";
 pub const INPUT_FILE_PATH: &str = "day1/resources/puzzle_inputs";
@@ -26,13 +28,13 @@ pub fn solve(problem_part: ProblemPart, file_path: &str) -> Result<()> {
             let (expense_1, expense_2) = analyzer.find_summing_pair(2020)?;
             let solution = expense_1 * expense_2;
             println!("{} solution: {}", problem_part, solution);
-        }
+        },
         ProblemPart::Two => {
             let analyzer = ExpenseAnalyzer::new(file_path)?;
             let (expense_1, expense_2, expense_3) = analyzer.find_summing_triple(2020)?;
             let solution = expense_1 * expense_2 * expense_3;
             println!("{} solution: {}", problem_part, solution);
-        }
+        },
     }
     Ok(())
 }
@@ -67,10 +69,7 @@ impl ExpenseAnalyzer {
                 }
             }
         }
-        Err(anyhow!(
-            "Could not find a pair of expenses summing to {}",
-            target_sum
-        ))
+        Err(anyhow!("Could not find a pair of expenses summing to {}", target_sum))
     }
 
     fn find_summing_triple(&self, target_sum: u32) -> Result<(u32, u32, u32)> {
@@ -87,9 +86,6 @@ impl ExpenseAnalyzer {
                 }
             }
         }
-        Err(anyhow!(
-            "Could not find a set of expenses summing to {}",
-            target_sum
-        ))
+        Err(anyhow!("Could not find a set of expenses summing to {}", target_sum))
     }
 }
