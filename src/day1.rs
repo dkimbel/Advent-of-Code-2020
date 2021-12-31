@@ -1,42 +1,40 @@
-use std::error::Error;
 use std::fs;
 use std::io::{BufRead, BufReader};
 
 use anyhow::{anyhow, Result};
 
-use crate::ProblemPart;
+use crate::problem::{Part, Solvable};
 
 // TODO(dkimbel): POTENTIAL IMPROVEMENTS
-//   - make some trait that lets every day's solution impl solve with an input
-//     file path and a ProblemPart. Also make it expose the input file path
-//     const/attr?
-//   - refactor ProblemPart into its own file?
-//   - start my own custom rustfmt config file
-//   - make my own Clippy config
-//   - try out the CLion profiler on this code
+//   - create a rudimentary test using sample file, and ensure that I have no
+//     more 'unused' warnings
 //   - create a custom iterator that can take an arbitrary number of input vecs
 //     and return a vec (or ideally array) of their combined values; then use
 //     that to solve parts one and two using the same code
 
-pub const SAMPLE_FILE_PATH: &str = "day1/resources/sample";
-pub const INPUT_FILE_PATH: &str = "day1/resources/puzzle_inputs";
+const SAMPLE_FILE_PATH: &str = "day1/resources/sample";
+const INPUT_FILE_PATH: &str = "day1/resources/puzzle_inputs";
 
-pub fn solve(problem_part: ProblemPart, file_path: &str) -> Result<()> {
-    match problem_part {
-        ProblemPart::One => {
-            let analyzer = ExpenseAnalyzer::new(file_path)?;
-            let (expense_1, expense_2) = analyzer.find_summing_pair(2020)?;
-            let solution = expense_1 * expense_2;
-            println!("{} solution: {}", problem_part, solution);
-        },
-        ProblemPart::Two => {
-            let analyzer = ExpenseAnalyzer::new(file_path)?;
-            let (expense_1, expense_2, expense_3) = analyzer.find_summing_triple(2020)?;
-            let solution = expense_1 * expense_2 * expense_3;
-            println!("{} solution: {}", problem_part, solution);
-        },
+pub struct Day1;
+
+impl Solvable for Day1 {
+    fn solve(problem_part: Part) -> Result<()> {
+        let analyzer = ExpenseAnalyzer::new(INPUT_FILE_PATH)?;
+
+        match problem_part {
+            Part::One => {
+                let (expense_1, expense_2) = analyzer.find_summing_pair(2020)?;
+                let solution = expense_1 * expense_2;
+                println!("{} solution: {}", problem_part, solution);
+            },
+            Part::Two => {
+                let (expense_1, expense_2, expense_3) = analyzer.find_summing_triple(2020)?;
+                let solution = expense_1 * expense_2 * expense_3;
+                println!("{} solution: {}", problem_part, solution);
+            },
+        }
+        Ok(())
     }
-    Ok(())
 }
 
 #[derive(Debug)]
