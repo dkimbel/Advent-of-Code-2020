@@ -3,13 +3,12 @@ use std::fs;
 use std::io::{BufRead, BufReader};
 
 use crate::ProblemPart;
+use anyhow::{anyhow, Result};
 
 // TODO(dkimbel): POTENTIAL IMPROVEMENTS
 //   - make some trait that lets every day's solution impl solve with an input
 //     file path and a ProblemPart. Also make it expose the input file path const/attr?
 //   - refactor ProblemPart into its own file?
-//   - have an `Expense` tuplestruct for u32? type alias?
-//   - try using Anyhow package
 //   - start my own custom rustfmt config file
 //   - make my own Clippy config
 //   - try out the CLion profiler on this code
@@ -20,7 +19,7 @@ use crate::ProblemPart;
 pub const SAMPLE_FILE_PATH: &str = "day1/resources/sample";
 pub const INPUT_FILE_PATH: &str = "day1/resources/puzzle_inputs";
 
-pub fn solve(problem_part: ProblemPart, file_path: &str) -> Result<(), Box<dyn Error>> {
+pub fn solve(problem_part: ProblemPart, file_path: &str) -> Result<()> {
     match problem_part {
         ProblemPart::One => {
             let analyzer = ExpenseAnalyzer::new(file_path)?;
@@ -44,7 +43,7 @@ struct ExpenseAnalyzer {
 }
 
 impl ExpenseAnalyzer {
-    fn new(file_path: &str) -> Result<Self, Box<dyn Error>> {
+    fn new(file_path: &str) -> Result<Self> {
         let file = fs::File::open(file_path)?;
         let reader = BufReader::new(file);
 
@@ -57,7 +56,7 @@ impl ExpenseAnalyzer {
         Ok(Self { expenses })
     }
 
-    fn find_summing_pair(&self, target_sum: u32) -> Result<(u32, u32), Box<dyn Error>> {
+    fn find_summing_pair(&self, target_sum: u32) -> Result<(u32, u32)> {
         let num_expenses = self.expenses.len();
         for i in 0..num_expenses {
             for j in (i + 1)..num_expenses {
@@ -68,14 +67,13 @@ impl ExpenseAnalyzer {
                 }
             }
         }
-        Err(format!(
+        Err(anyhow!(
             "Could not find a pair of expenses summing to {}",
             target_sum
-        )
-        .into())
+        ))
     }
 
-    fn find_summing_triple(&self, target_sum: u32) -> Result<(u32, u32, u32), Box<dyn Error>> {
+    fn find_summing_triple(&self, target_sum: u32) -> Result<(u32, u32, u32)> {
         let num_expenses = self.expenses.len();
         for i in 0..num_expenses {
             for j in (i + 1)..num_expenses {
@@ -89,6 +87,9 @@ impl ExpenseAnalyzer {
                 }
             }
         }
-        Err(format!("Could not find a set of expenses summing to {}", target_sum).into())
+        Err(anyhow!(
+            "Could not find a set of expenses summing to {}",
+            target_sum
+        ))
     }
 }

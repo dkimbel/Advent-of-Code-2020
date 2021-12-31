@@ -1,6 +1,7 @@
-use std::error::Error;
 use std::fmt;
 use std::fmt::Formatter;
+
+use anyhow::Result;
 
 mod day1;
 
@@ -20,6 +21,6 @@ impl fmt::Display for ProblemPart {
     }
 }
 
-fn main() -> Result<(), Box<dyn Error>> {
+fn main() -> Result<()> {
     day1::solve(ProblemPart::Two, day1::INPUT_FILE_PATH)
 }
