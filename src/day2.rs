@@ -6,9 +6,6 @@ use anyhow::{Context, Result};
 use crate::problem::{Part, Solved};
 
 // TODO(dkimbel): POTENTIAL IMPROVEMENTS
-//   - Fix too-short comment wrapping in allows_password pt 2
-//   - Figure out how to use `?` within a closure
-//   - Figure out how to collapse validator.is_valid check to one line
 //   - Reduce boilerplate shared between Day modules. Is a trait the key? At the
 //     worst, create a 'template' file I can `cp` to make a new Day, and add it
 //     to README.
@@ -21,14 +18,13 @@ impl Day2 {
     fn solve(problem_part: Part, input_file_path: &str) -> Result<u32> {
         let file = File::open(input_file_path)?;
         let reader = BufReader::new(file);
-        let solution = reader.lines().fold(0, |acc, line| {
-            let validator = PasswordValidator::new(&line.unwrap()).unwrap();
-            if validator.is_valid(problem_part).unwrap() {
-                acc + 1
-            } else {
-                acc
+        let mut solution = 0;
+        for line in reader.lines() {
+            let validator = PasswordValidator::new(&line?)?;
+            if validator.is_valid(problem_part)? {
+                solution += 1;
             }
-        });
+        }
         Ok(solution)
     }
 }
@@ -103,23 +99,34 @@ impl PasswordPolicy {
                     && char_occurrences >= self.lower_range_num)
             },
             Part::Two => {
-                // In part two, we require that the character number specified
-                // by lower_range_num XOR the character number specified
-                // by upper_range_num must equal the given char.
-                // Note that these are one-based indexes, not zero-based.
+                // In part two, we require that the character number specified by the lower num
+                // XOR the character number specified by the upper num must equal the given
+                // char. Note that these are one-based indexes, not zero-based.
                 let chars = password.chars().collect::<Vec<_>>();
                 let first_char_match = chars
-                    .get(self.lower_range_num - 1)
+                    .get(self.lower_range_index()?)
                     .context("Password must contain lower char number specified by policy")?
                     == &self.character;
                 let second_char_match = chars
-                    .get(self.upper_range_num - 1)
+                    .get(self.upper_range_index()?)
                     .context("Password must contain upper char number specified by policy")?
                     == &self.character;
                 Ok((first_char_match && !second_char_match)
                     || (!first_char_match && second_char_match))
             },
         }
+    }
+
+    fn lower_range_index(&self) -> Result<usize> {
+        Self::convert_to_index(self.lower_range_num)
+    }
+
+    fn upper_range_index(&self) -> Result<usize> {
+        Self::convert_to_index(self.upper_range_num)
+    }
+
+    fn convert_to_index(num: usize) -> Result<usize> {
+        num.checked_sub(1).context("Subtraction from usize failed")
     }
 }
 
