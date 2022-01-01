@@ -10,7 +10,7 @@ use crate::problem::{Part, Solved};
 //     and return a vec (or ideally array) of their combined values; then use
 //     that to solve parts one and two using the same code
 
-const INPUT_FILE_PATH: &str = "src/day1/resources/puzzle_inputs";
+const INPUT_FILE_PATH: &str = "src/day1/puzzle_inputs";
 
 pub struct Day1;
 
@@ -69,7 +69,10 @@ impl ExpenseAnalyzer {
                 }
             }
         }
-        Err(anyhow!("Could not find a pair of expenses summing to {}", target_sum))
+        Err(anyhow!(
+            "Could not find a pair of expenses summing to {}",
+            target_sum
+        ))
     }
 
     fn find_summing_triple(&self, target_sum: u32) -> Result<(u32, u32, u32)> {
@@ -86,7 +89,10 @@ impl ExpenseAnalyzer {
                 }
             }
         }
-        Err(anyhow!("Could not find a set of expenses summing to {}", target_sum))
+        Err(anyhow!(
+            "Could not find a set of expenses summing to {}",
+            target_sum
+        ))
     }
 }
 
@@ -94,7 +100,7 @@ impl ExpenseAnalyzer {
 mod tests {
     use super::*;
 
-    const TEST_FILE_PATH: &str = "src/day1/resources/sample";
+    const TEST_FILE_PATH: &str = "src/day1/sample";
 
     #[test]
     fn test_part_one() {

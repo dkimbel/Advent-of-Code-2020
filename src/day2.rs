@@ -10,7 +10,7 @@ use crate::problem::{Part, Solved};
 //     worst, create a 'template' file I can `cp` to make a new Day, and add it
 //     to README.
 
-const INPUT_FILE_PATH: &str = "src/day2/resources/puzzle_inputs";
+const INPUT_FILE_PATH: &str = "src/day2/puzzle_inputs";
 
 pub struct Day2;
 
@@ -134,7 +134,7 @@ impl PasswordPolicy {
 mod tests {
     use super::*;
 
-    const TEST_FILE_PATH: &str = "src/day2/resources/sample";
+    const TEST_FILE_PATH: &str = "src/day2/sample";
 
     #[test]
     fn test_part_one() {
