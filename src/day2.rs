@@ -6,6 +6,7 @@ use anyhow::{Context, Result};
 use crate::problem::{Part, Solved};
 
 // TODO(dkimbel): POTENTIAL IMPROVEMENTS
+//   - Fix too-short comment wrapping in allows_password pt 2
 //   - Figure out how to use `?` within a closure
 //   - Figure out how to collapse validator.is_valid check to one line
 //   - Reduce boilerplate shared between Day modules. Is a trait the key? At the
@@ -20,17 +21,14 @@ impl Day2 {
     fn solve(problem_part: Part, input_file_path: &str) -> Result<u32> {
         let file = File::open(input_file_path)?;
         let reader = BufReader::new(file);
-        let solution = match problem_part {
-            Part::One => reader.lines().fold(0, |acc, line| {
-                let validator = PasswordValidator::new(&line.unwrap()).unwrap();
-                if validator.is_valid() {
-                    acc + 1
-                } else {
-                    acc
-                }
-            }),
-            Part::Two => todo!(),
-        };
+        let solution = reader.lines().fold(0, |acc, line| {
+            let validator = PasswordValidator::new(&line.unwrap()).unwrap();
+            if validator.is_valid(problem_part).unwrap() {
+                acc + 1
+            } else {
+                acc
+            }
+        });
         Ok(solution)
     }
 }
@@ -60,15 +58,15 @@ impl PasswordValidator {
         })
     }
 
-    fn is_valid(&self) -> bool {
-        self.policy.allows_password(&self.password)
+    fn is_valid(&self, problem_part: Part) -> Result<bool> {
+        self.policy.allows_password(&self.password, problem_part)
     }
 }
 
 struct PasswordPolicy {
-    character: char,
-    min_count: u8,
-    max_count: u8,
+    character:       char,
+    lower_range_num: usize,
+    upper_range_num: usize,
 }
 
 impl PasswordPolicy {
@@ -77,26 +75,51 @@ impl PasswordPolicy {
         let (range_input, char_input) = input
             .split_once(" ")
             .context("Failed to split policy input into range and character")?;
-        let (min_input, max_input) = range_input
+        let (lower_range_input, upper_range_input) = range_input
             .split_once("-")
             .context("Failed to split range input into min and max")?;
         Ok(Self {
-            min_count: min_input.parse::<u8>()?,
-            max_count: max_input.parse::<u8>()?,
-            character: char_input
+            lower_range_num: lower_range_input.parse::<usize>()?,
+            upper_range_num: upper_range_input.parse::<usize>()?,
+            character:       char_input
                 .chars()
                 .next()
                 .context("Failed to extract char from policy input")?,
         })
     }
 
-    fn allows_password(&self, password: &str) -> bool {
-        let char_occurrences =
-            password.chars().fold(
-                0,
-                |acc, char| if char == self.character { acc + 1 } else { acc },
-            );
-        char_occurrences <= self.max_count && char_occurrences >= self.min_count
+    fn allows_password(&self, password: &str, problem_part: Part) -> Result<bool> {
+        match problem_part {
+            Part::One => {
+                // In part one, we treat the policy's upper_range_num as the max allowable
+                // number of occurrences of the character. Similarly, we treat lower_range_num
+                // as the min allowable number.
+                let char_occurrences =
+                    password.chars().fold(
+                        0,
+                        |acc, char| if char == self.character { acc + 1 } else { acc },
+                    );
+                Ok(char_occurrences <= self.upper_range_num
+                    && char_occurrences >= self.lower_range_num)
+            },
+            Part::Two => {
+                // In part two, we require that the character number specified
+                // by lower_range_num XOR the character number specified
+                // by upper_range_num must equal the given char.
+                // Note that these are one-based indexes, not zero-based.
+                let chars = password.chars().collect::<Vec<_>>();
+                let first_char_match = chars
+                    .get(self.lower_range_num - 1)
+                    .context("Password must contain lower char number specified by policy")?
+                    == &self.character;
+                let second_char_match = chars
+                    .get(self.upper_range_num - 1)
+                    .context("Password must contain upper char number specified by policy")?
+                    == &self.character;
+                Ok((first_char_match && !second_char_match)
+                    || (!first_char_match && second_char_match))
+            },
+        }
     }
 }
 
@@ -115,6 +138,6 @@ mod tests {
     #[test]
     fn test_part_two() {
         let solution = Day2::solve(Part::Two, TEST_FILE_PATH).unwrap();
-        assert_eq!(solution, 241861950);
+        assert_eq!(solution, 1);
     }
 }
