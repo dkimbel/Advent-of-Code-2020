@@ -1,4 +1,4 @@
-use std::fs;
+use std::fs::File;
 use std::io::{BufRead, BufReader};
 
 use anyhow::{anyhow, Result};
@@ -46,7 +46,7 @@ struct ExpenseAnalyzer {
 
 impl ExpenseAnalyzer {
     fn new(file_path: &str) -> Result<Self> {
-        let file = fs::File::open(file_path)?;
+        let file = File::open(file_path)?;
         let reader = BufReader::new(file);
 
         let mut expenses = Vec::new();
