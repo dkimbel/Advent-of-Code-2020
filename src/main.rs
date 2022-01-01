@@ -1,10 +1,11 @@
-use day2::Day2;
+use day3::Day3;
 use problem::{Part, Solved};
 
 mod day1;
 mod day2;
+mod day3;
 mod problem;
 
 fn main() {
-    Day2::print_solution(Part::Two);
+    Day3::print_solution(Part::One);
 }
