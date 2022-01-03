@@ -7,5 +7,5 @@ mod day3;
 mod problem;
 
 fn main() {
-    Day3::print_solution(Part::One);
+    Day3::print_solution(Part::Two);
 }

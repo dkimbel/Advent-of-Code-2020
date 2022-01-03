@@ -14,9 +14,24 @@ impl Day3 {
         match problem_part {
             Part::One => {
                 let analyzer = PathAnalyzer::new(input_file_path)?;
-                analyzer.calculate_num_trees(3)
+                analyzer.calculate_num_trees(Slope { tiles_right: 3, tiles_down: 1 })
             },
-            Part::Two => todo!(),
+            Part::Two => {
+                let analyzer = PathAnalyzer::new(input_file_path)?;
+                let slopes = [
+                    Slope { tiles_right: 1, tiles_down: 1 },
+                    Slope { tiles_right: 3, tiles_down: 1 },
+                    Slope { tiles_right: 5, tiles_down: 1 },
+                    Slope { tiles_right: 7, tiles_down: 1 },
+                    Slope { tiles_right: 1, tiles_down: 2 },
+                ];
+
+                let mut tree_counts = Vec::new();
+                for slope in slopes {
+                    tree_counts.push(analyzer.calculate_num_trees(slope)?)
+                }
+                Ok(tree_counts.iter().fold(1, |acc, count| acc * count))
+            },
         }
     }
 }
@@ -44,11 +59,18 @@ impl Tile {
     }
 }
 
+struct Slope {
+    tiles_down:  usize,
+    tiles_right: usize,
+}
+
 struct PathAnalyzer {
     grid: Vec<Vec<Tile>>,
 }
 
 impl PathAnalyzer {
+    const ALL_SLOPES: [usize; 5] = [1, 1, 1, 1, 1];
+
     fn new(input_file_path: &str) -> Result<Self> {
         let file = File::open(input_file_path).context("Unable to open input file")?;
         let reader = BufReader::new(file);
@@ -69,19 +91,19 @@ impl PathAnalyzer {
         Ok(Self { grid })
     }
 
-    fn calculate_num_trees(&self, tiles_right_per_down: usize) -> Result<usize> {
+    fn calculate_num_trees(&self, slope: Slope) -> Result<usize> {
         let mut num_trees = 0;
         // ignore the starting tile, so DON'T start at 0, 0
-        let mut x = tiles_right_per_down;
-        let mut y = 1;
+        let mut x = slope.tiles_right;
+        let mut y = slope.tiles_down;
 
         while y < self.grid.len() {
             let next_tile = self.get_tile_at_coords(x, y)?;
             if *next_tile == Tile::Tree {
                 num_trees += 1;
             }
-            y += 1;
-            x += tiles_right_per_down;
+            y += slope.tiles_down;
+            x += slope.tiles_right;
         }
 
         Ok(num_trees)
@@ -118,7 +140,6 @@ mod tests {
     #[test]
     fn test_part_two() {
         let solution = Day3::solve(Part::Two, TEST_FILE_PATH).unwrap();
-        todo!()
-        // assert_eq!(solution, 1);
+        assert_eq!(solution, 336);
     }
 }
