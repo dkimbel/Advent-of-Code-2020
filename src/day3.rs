@@ -69,8 +69,6 @@ struct PathAnalyzer {
 }
 
 impl PathAnalyzer {
-    const ALL_SLOPES: [usize; 5] = [1, 1, 1, 1, 1];
-
     fn new(input_file_path: &str) -> Result<Self> {
         let file = File::open(input_file_path).context("Unable to open input file")?;
         let reader = BufReader::new(file);
