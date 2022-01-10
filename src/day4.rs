@@ -4,6 +4,12 @@ use anyhow::{Context, Result};
 
 use crate::problem::{Part, Solved};
 
+// TODO(dkimbel): POTENTIAL IMPROVEMENTS
+//   - In part_two ValidCredential::new, don't re-do the work of creating
+//     CoreCredentials: right now I'm potentially doing it twice, once for
+//     Passport and once for NorthPoleID. Only build it once, and either
+//     copy/clone it or just pass a reference to pass/north.
+
 const INPUT_FILE_PATH: &str = "src/day4/puzzle_inputs";
 
 pub struct Day4;
