@@ -81,6 +81,7 @@ mod part_two {
         }
     }
 
+    #[derive(Debug)]
     enum Measure {
         Inches,
         Centimeters,
@@ -116,7 +117,20 @@ mod part_two {
                 .collect::<String>()
                 .parse::<u32>()
                 .context("Failed to parse u32 from Height")?;
-            Ok(Height(*magnitude, measure))
+
+            let required_range = match measure {
+                Measure::Inches => 59_u32..=76_u32,
+                Measure::Centimeters => 150_u32..=193_u32,
+            };
+            if required_range.contains(magnitude) {
+                Ok(Height(*magnitude, measure))
+            } else {
+                Err(anyhow!(
+                    "Height magnitude {} out of range for measurement {:?}",
+                    magnitude,
+                    measure
+                ))
+            }
         }
     }
 
