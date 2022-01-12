@@ -294,6 +294,7 @@ mod part_two {
         }
     }
 
+    #[allow(dead_code)]
     struct CoreCredentials {
         byr: u32,
         iyr: u32,
@@ -310,7 +311,8 @@ mod part_two {
         }
     }
 
-    struct Passport<'a> {
+    #[allow(dead_code)]
+    pub struct Passport<'a> {
         core_credentials: CoreCredentials,
         cid: &'a str,
     }
@@ -326,7 +328,8 @@ mod part_two {
         }
     }
 
-    struct NorthPoleID {
+    #[allow(dead_code)]
+    pub struct NorthPoleID {
         core_credentials: CoreCredentials,
     }
 
@@ -456,6 +459,7 @@ mod part_one {
         }
     }
 
+    #[allow(dead_code)]
     struct CoreCredentials<'a> {
         byr: &'a str,
         iyr: &'a str,
@@ -472,7 +476,8 @@ mod part_one {
         }
     }
 
-    struct Passport<'a> {
+    #[allow(dead_code)]
+    pub struct Passport<'a> {
         core_credentials: CoreCredentials<'a>,
         cid: &'a str,
     }
@@ -488,7 +493,8 @@ mod part_one {
         }
     }
 
-    struct NorthPoleID<'a> {
+    #[allow(dead_code)]
+    pub struct NorthPoleID<'a> {
         core_credentials: CoreCredentials<'a>,
     }
 
