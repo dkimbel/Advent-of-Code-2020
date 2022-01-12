@@ -1,8 +1,8 @@
 use std::cmp::max;
-use std::fs::File;
+use std::fs::{self, File};
 use std::io::{BufRead, BufReader};
 
-use anyhow::{Context, Result};
+use anyhow::{anyhow, Context, Result};
 
 use crate::problem::{Part, Solved};
 
@@ -12,11 +12,10 @@ pub struct Day5;
 
 impl Day5 {
     fn solve(problem_part: Part, input_file_path: &str) -> Result<u32> {
-        let file = File::open(input_file_path).context("Failed to open input file")?;
-        let reader = BufReader::new(file);
-
         match problem_part {
             Part::One => {
+                let file = File::open(input_file_path).context("Failed to open input file")?;
+                let reader = BufReader::new(file);
                 let mut max_id = u32::MIN;
                 for line in reader.lines() {
                     let str = line?;
@@ -26,15 +25,58 @@ impl Day5 {
                 }
                 Ok(max_id)
             },
-            Part::Two => todo!(),
+            Part::Two => {
+                let inputs = fs::read_to_string(input_file_path)?;
+                let mut seat_ids = inputs
+                    .split('\n')
+                    .map(boarding_pass::BoardingPass::new)
+                    .filter_map(|p| p.parse_seat_id().ok())
+                    .collect::<Vec<_>>();
+                seat_ids.sort_unstable();
+                let seat_id_pairs_iter = IterByPair::new(Box::new(seat_ids.into_iter()));
+
+                for (first, second) in seat_id_pairs_iter {
+                    if second - first == 2 {
+                        return Ok(second - 1);
+                    }
+                }
+                Err(anyhow!("Failed to find unoccupied seat"))
+            },
         }
     }
 }
 
-impl Solved for Day5 {
-    fn print_solution(part: Part) {
-        let solution = Self::solve(part, INPUT_FILE_PATH).unwrap();
-        println!("Day 5 {} solution: {}", part, solution);
+// it was totally unnecessary to define my own iterator here -- I could have
+// just looked up values in my vec by index and index + 1, or even used a
+// Peekable -- but this was good practice, my first time implementing the
+// Iterator trait
+struct IterByPair<T: Copy> {
+    next:       Option<(T, T)>,
+    inner_iter: Box<dyn Iterator<Item = T>>,
+}
+
+impl<T: Copy> IterByPair<T> {
+    fn new(inner_iter: Box<dyn Iterator<Item = T>>) -> Self {
+        Self { next: None, inner_iter }
+    }
+}
+
+impl<T: Copy> Iterator for IterByPair<T> {
+    type Item = (T, T);
+
+    fn next(&mut self) -> Option<Self::Item> {
+        match &self.next {
+            None => {
+                let first = self.inner_iter.next()?;
+                let second = self.inner_iter.next()?;
+                self.next = Some((first, second));
+            },
+            Some((zeroth, first)) => {
+                let second = self.inner_iter.next()?;
+                self.next = Some((*first, second));
+            },
+        }
+        self.next
     }
 }
 
@@ -107,6 +149,13 @@ mod boarding_pass {
     }
 }
 
+impl Solved for Day5 {
+    fn print_solution(part: Part) {
+        let solution = Self::solve(part, INPUT_FILE_PATH).unwrap();
+        println!("Day 5 {} solution: {}", part, solution);
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -117,11 +166,5 @@ mod tests {
     fn test_part_one() {
         let solution = Day5::solve(Part::One, TEST_FILE_PATH).unwrap();
         assert_eq!(solution, 820);
-    }
-
-    #[test]
-    fn test_part_two() {
-        let solution = Day5::solve(Part::Two, TEST_FILE_PATH).unwrap();
-        assert_eq!(solution, 4);
     }
 }
