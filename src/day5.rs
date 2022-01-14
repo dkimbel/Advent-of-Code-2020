@@ -51,7 +51,7 @@ impl Day5 {
 // Peekable -- but this was good practice, my first time implementing the
 // Iterator trait
 struct IterByPair<T: Copy> {
-    next:       Option<(T, T)>,
+    next: Option<(T, T)>,
     inner_iter: Box<dyn Iterator<Item = T>>,
 }
 
@@ -71,7 +71,7 @@ impl<T: Copy> Iterator for IterByPair<T> {
                 let second = self.inner_iter.next()?;
                 self.next = Some((first, second));
             },
-            Some((zeroth, first)) => {
+            Some((_, first)) => {
                 let second = self.inner_iter.next()?;
                 self.next = Some((*first, second));
             },
