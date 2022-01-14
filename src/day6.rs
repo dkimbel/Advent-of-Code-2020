@@ -5,6 +5,12 @@ use anyhow::{anyhow, Context, Result};
 
 use crate::problem::{Part, Solved};
 
+// TODO(dkimbel): POTENTIAL IMPROVEMENTS
+//   - Reduce this to using only one Group type, and either have that track
+//     both unique and consensus sets, OR have it just track a hashmap of
+//     chars-to-counts along with a num-members-of-group int (so we can deduce
+//     which chars were present for every group member).
+
 const INPUT_FILE_PATH: &str = "src/day6/puzzle_inputs";
 
 pub struct Day6;
