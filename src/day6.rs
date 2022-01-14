@@ -42,19 +42,19 @@ impl ConsensusGroup {
             .split('\n')
             .map(|s| s.trim())
             .filter(|s| !s.is_empty());
+
         for individuals_answers in cleaned_input {
             let individuals_set = individuals_answers.chars().collect::<HashSet<_>>();
             maybe_shared_answers = match maybe_shared_answers {
                 None => Some(individuals_set),
                 Some(shared_set) => {
-                    let intersect_refs = shared_set.intersection(&individuals_set);
-                    let intersect = intersect_refs.copied();
+                    let intersect = shared_set.intersection(&individuals_set).copied();
                     Some(intersect.collect::<HashSet<char>>())
                 },
             }
         }
 
-        let shared_answers = maybe_shared_answers.ok_or(anyhow!("Input was empty"))?;
+        let shared_answers = maybe_shared_answers.ok_or(anyhow!("Cleaned-up input was empty"))?;
         Ok(Self { shared_answers })
     }
 
