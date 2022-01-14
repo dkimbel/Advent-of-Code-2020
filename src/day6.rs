@@ -1,7 +1,7 @@
 use std::collections::HashSet;
 use std::fs;
 
-use anyhow::{Context, Result};
+use anyhow::{anyhow, Context, Result};
 
 use crate::problem::{Part, Solved};
 
@@ -14,20 +14,60 @@ impl Day6 {
         let input = fs::read_to_string(input_file_path).context("Unable to read input file")?;
         match problem_part {
             Part::One => {
-                let groups = input.split("\n\n").map(Group::new);
+                let groups = input.split("\n\n").map(UniqueGroup::new);
                 let summed_totals: usize = groups.map(|g| g.num_unique_answers()).sum();
                 Ok(summed_totals)
             },
-            Part::Two => todo!(),
+            Part::Two => {
+                let groups = input.split("\n\n").map(ConsensusGroup::new);
+                let mut summed_totals = 0;
+                for maybe_group in groups {
+                    let group = maybe_group.context("All groups must be defined")?;
+                    summed_totals += group.num_shared_answers();
+                }
+                Ok(summed_totals)
+            },
         }
     }
 }
 
-struct Group {
+struct ConsensusGroup {
+    shared_answers: HashSet<char>,
+}
+
+impl ConsensusGroup {
+    fn new(input: &str) -> Result<Self> {
+        let mut maybe_shared_answers: Option<HashSet<char>> = None;
+        let cleaned_input = input
+            .split('\n')
+            .map(|s| s.trim())
+            .filter(|s| !s.is_empty());
+        for individuals_answers in cleaned_input {
+            let individuals_set = individuals_answers.chars().collect::<HashSet<_>>();
+            maybe_shared_answers = match maybe_shared_answers {
+                None => Some(individuals_set),
+                Some(shared_set) => {
+                    let intersect_refs = shared_set.intersection(&individuals_set);
+                    let intersect = intersect_refs.copied();
+                    Some(intersect.collect::<HashSet<char>>())
+                },
+            }
+        }
+
+        let shared_answers = maybe_shared_answers.ok_or(anyhow!("Input was empty"))?;
+        Ok(Self { shared_answers })
+    }
+
+    fn num_shared_answers(&self) -> usize {
+        self.shared_answers.len()
+    }
+}
+
+struct UniqueGroup {
     unique_answers: HashSet<char>,
 }
 
-impl Group {
+impl UniqueGroup {
     fn new(input: &str) -> Self {
         let mut unique_answers = HashSet::<char>::new();
         for individuals_answers in input.split('\n') {
@@ -64,9 +104,8 @@ mod tests {
     }
 
     #[test]
-    #[ignore]
     fn test_part_two() {
         let solution = Day6::solve(Part::Two, TEST_FILE_PATH).unwrap();
-        assert_eq!(solution, 820);
+        assert_eq!(solution, 6);
     }
 }

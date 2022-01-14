@@ -10,5 +10,5 @@ mod day6;
 mod problem;
 
 fn main() {
-    Day6::print_solution(Part::One);
+    Day6::print_solution(Part::Two);
 }
