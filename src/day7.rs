@@ -8,8 +8,8 @@ use crate::problem::{Part, Solved};
 
 // TODO(dkimbel): POTENTIAL IMPROVEMENTS
 //   - don't compile the same regex repeatedly in Bag::new
-//   - make can_contain_color and num_inner_bags return a Result type sothere's an error
-//     if the given color can't be found?
+//   - make can_contain_color and num_inner_bags return a Result type so
+//     there's an error if the given color can't be found?
 
 const INPUT_FILE_PATH: &str = "src/day7/puzzle_inputs";
 
